@@ -121,31 +121,128 @@ class _PokemonScreenState extends State<PokemonScreen> {
   }
 
   Widget _construirTarjetaPokemon(Pokemon pokemon) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: () => _mostrarDetallePokemon(context, pokemon),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 4,
+        color: pokemon.getColor().withAlpha(50),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.network(
+              pokemon.imagenUrl,
+              width: 80,
+              height: 80,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              pokemon.nombre.toUpperCase(),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            Text("ID: ${pokemon.id}"),
+            Text("Tipo: ${pokemon.tipos.join(', ')}"),
+          ],
+        ),
       ),
-      elevation: 4,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    );
+  }
+
+  void _mostrarDetallePokemon(BuildContext context, Pokemon pokemon) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: pokemon.getColor(),
+              width: 3,
+            ),
+          ),
+          title: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: pokemon.getColor(),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              pokemon.nombre.toUpperCase(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: pokemon.getColor().withAlpha(30),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Image.network(
+                    pokemon.imagenUrl,
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildDetailRow("ID", pokemon.id.toString()),
+                _buildDetailRow("Tipos", pokemon.tipos.join(', ')),
+                _buildDetailRow("Altura", "${pokemon.altura / 10} m"),
+                _buildDetailRow("Peso", "${pokemon.peso / 10} kg"),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cerrar',
+                style: TextStyle(
+                  color: pokemon.getColor(),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
         children: [
-          Image.network(
-            pokemon.imagenUrl,
-            width: 80,
-            height: 80,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(height: 8),
           Text(
-            pokemon.nombre.toUpperCase(),
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            "$label: ",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
-          Text("ID: ${pokemon.id}"),
-          Text("Tipo: ${pokemon.tipos.join(', ')}"),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16),
+          ),
         ],
       ),
     );
   }
+
+// ... (resto del archivo igual)
 
   Widget _construirBotonesPaginacion(PokemonProvider proveedor) {
     return Padding(
